@@ -291,17 +291,22 @@ module Paperclip
     # thumbnails forcefully, by reobtaining the original file and going through
     # the post-process again.
     def reprocess!(*style_args)
+      puts "custom Paperclip fork"
       saved_only_process, @options[:only_process] = @options[:only_process], style_args
+      saved_preserve_files, @options[:preserve_files] = @options[:preserve_files], true
       begin
         assign(self)
+        save
         instance.save
       rescue Errno::EACCES => e
         warn "#{e} - skipping file."
         false
       ensure
         @options[:only_process] = saved_only_process
+        @options[:preserve_files] = saved_preserve_files
       end
     end
+
 
     # Returns true if a file has been assigned.
     def file?
